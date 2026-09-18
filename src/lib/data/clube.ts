@@ -59,16 +59,26 @@ export async function registarClube(
   }
 
   const supabase = await createClient()
-  const { error } = await supabase.from('clubes').insert({
-    nome: dados.data.nome,
-    localizacao: dados.data.localizacao || null,
-    nif: dados.data.nif,
-    responsavel_id: user.id,
-  })
+  const { data: clube, error } = await supabase
+    .from('clubes')
+    .insert({
+      nome: dados.data.nome,
+      localizacao: dados.data.localizacao || null,
+      nif: dados.data.nif,
+      responsavel_id: user.id,
+    })
+    .select('id')
+    .single()
 
   if (error) {
     return { erro: error.code === '23505' ? 'Já existe um clube com este NIF.' : error.message }
   }
+
+  // A direcção fica também registada como sócia activa do próprio clube —
+  // necessário para ver passeios "privados" (só sócios) que o clube organize.
+  await supabase
+    .from('clube_membros')
+    .insert({ clube_id: clube.id, utilizador_id: user.id, estado: 'activo' })
 
   await supabase
     .from('perfis')

@@ -87,24 +87,28 @@ export async function criarPasseio(
 // contrarie — sem motas registadas, não se filtra nada (evita esconder
 // passeios por falta de dados, não por falta de elegibilidade real). Com
 // várias motas, basta UMA cumprir os critérios para o passeio aparecer.
+// O organizador (individual ou clube que dirige) vê sempre os seus próprios
+// passeios, mesmo que não cumpra os critérios de elegibilidade que ele
+// próprio definiu.
 export async function listarPasseiosVisiveis() {
   const supabase = await createClient()
   const user = await obterUtilizadorAutenticado()
   if (!user) return []
 
-  const { data: motas } = await supabase
-    .from('motas')
-    .select('cilindrada_cc, marca')
-    .eq('utilizador_id', user.id)
-
-  const { data: passeios } = await supabase
-    .from('passeios')
-    .select('*')
-    .order('data', { ascending: true })
+  const [{ data: motas }, { data: clubesQueDirijo }, { data: passeios }] = await Promise.all([
+    supabase.from('motas').select('cilindrada_cc, marca').eq('utilizador_id', user.id),
+    supabase.from('clubes').select('id').eq('responsavel_id', user.id),
+    supabase.from('passeios').select('*').order('data', { ascending: true }),
+  ])
 
   if (!passeios) return []
 
+  const idsClubesQueDirijo = new Set((clubesQueDirijo ?? []).map((c) => c.id))
+
   return (passeios as Passeio[]).filter((p) => {
+    if (p.organizador_utilizador_id === user.id) return true
+    if (p.organizador_clube_id && idsClubesQueDirijo.has(p.organizador_clube_id)) return true
+
     if (!motas || motas.length === 0) return true
     if (p.cilindrada_min == null && p.cilindrada_max == null && !p.marca) return true
 
