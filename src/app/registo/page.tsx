@@ -56,7 +56,13 @@ export default function PaginaRegisto() {
           </label>
         </fieldset>
 
+        <p className="text-xs text-neutral-500">
+          Depois de criares a conta, vais receber um e-mail de confirmação — só consegues entrar
+          depois de confirmares.
+        </p>
+
         {estado.erro && <p className="text-sm text-red-600">{estado.erro}</p>}
+        {estado.mensagem && <p className="text-sm text-green-700">{estado.mensagem}</p>}
 
         <button
           type="submit"

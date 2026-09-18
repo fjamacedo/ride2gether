@@ -27,7 +27,14 @@ export default function PaginaLogin() {
           <input name="password" type="password" required className="rounded border px-3 py-2" />
         </label>
 
-        {estado.erro && <p className="text-sm text-red-600">{estado.erro}</p>}
+        {estado.erro && (
+          <div className="text-sm text-red-600">
+            <p>{estado.erro}</p>
+            <p className="mt-1 text-xs text-neutral-500">
+              Se acabaste de te registares, confirma primeiro o e-mail que te enviámos.
+            </p>
+          </div>
+        )}
 
         <button
           type="submit"

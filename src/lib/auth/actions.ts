@@ -13,6 +13,7 @@ const esquemaRegisto = z.object({
 
 export interface EstadoFormulario {
   erro?: string
+  mensagem?: string
 }
 
 export async function registar(
@@ -31,7 +32,7 @@ export async function registar(
   }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: dados.data.email,
     password: dados.data.password,
     options: {
@@ -41,6 +42,14 @@ export async function registar(
 
   if (error) {
     return { erro: error.message }
+  }
+
+  // Sem sessão devolvida = confirmação de e-mail obrigatória (definição por
+  // omissão da Supabase); com auto-confirm activo, já vem sessão e entra logo.
+  if (!data.session) {
+    return {
+      mensagem: `Conta criada. Enviámos um e-mail de confirmação para ${dados.data.email} — confirma antes de entrares.`,
+    }
   }
 
   redirect('/passeios')
