@@ -115,6 +115,17 @@ export async function listarPasseiosVisiveis() {
   })
 }
 
+export async function listarPasseiosDoClube(clubeId: string) {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('passeios')
+    .select('*')
+    .eq('organizador_clube_id', clubeId)
+    .order('data', { ascending: true })
+
+  return data ?? []
+}
+
 export async function obterPasseio(id: string) {
   const supabase = await createClient()
   const { data } = await supabase.from('passeios').select('*').eq('id', id).maybeSingle()
