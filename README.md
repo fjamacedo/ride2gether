@@ -40,9 +40,13 @@ Documentadas também em comentários no código, junto de onde se aplicam:
   nacional/internacional/público. Só "privado" filtra de facto (sócios do
   clube). Ver `supabase/migrations/0001_init.sql`.
 - **Elegibilidade por cilindrada/marca**: para os critérios de selecção do
-  passeio produzirem filtragem real (não apenas informativa), acrescentei
-  campos opcionais `cilindrada_cc`/`marca_moto` ao perfil do utilizador —
-  não estavam no modelo de dados original da secção 5.
+  passeio produzirem filtragem real (não apenas informativa), cada
+  utilizador pode registar até 2 motas (marca, modelo, ano, cilindrada —
+  tabela `motas`, ver `supabase/migrations/0002_motas.sql`); a filtragem
+  considera o passeio visível se pelo menos uma mota cumprir os critérios.
+  Matrícula foi deliberadamente excluída (dado pessoal sem uso definido até
+  existir o marketplace da Fase 3 — recolhê-la agora violaria minimização
+  de dados do RGPD).
 - **Adicionar sócio pelo dashboard**: só funciona se essa pessoa já se tiver
   registado na plataforma (procura por e-mail via função SQL dedicada). Não
   há fluxo de "convite" para quem ainda não tem conta.

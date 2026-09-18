@@ -175,8 +175,6 @@ export async function associarAClube(clubeId: string) {
 const esquemaPerfil = z.object({
   nome: z.string().min(2, 'Indica o teu nome'),
   contacto: z.string().optional(),
-  cilindrada_cc: z.string().optional(),
-  marca_moto: z.string().optional(),
 })
 
 export async function actualizarPerfil(
@@ -189,22 +187,17 @@ export async function actualizarPerfil(
   const dados = esquemaPerfil.safeParse({
     nome: formData.get('nome'),
     contacto: formData.get('contacto'),
-    cilindrada_cc: formData.get('cilindrada_cc'),
-    marca_moto: formData.get('marca_moto'),
   })
   if (!dados.success) {
     return { erro: dados.error.issues[0]?.message ?? 'Dados inválidos' }
   }
 
   const supabase = await createClient()
-  const cilindrada = dados.data.cilindrada_cc ? Number(dados.data.cilindrada_cc) : null
   const { error } = await supabase
     .from('perfis')
     .update({
       nome: dados.data.nome,
       contacto: dados.data.contacto || null,
-      cilindrada_cc: Number.isFinite(cilindrada) ? cilindrada : null,
-      marca_moto: dados.data.marca_moto || null,
     })
     .eq('id', user.id)
 

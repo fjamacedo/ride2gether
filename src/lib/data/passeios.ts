@@ -83,18 +83,19 @@ export async function criarPasseio(
 }
 
 // Nota sobre "elegibilidade" (secção 3.2): os critérios do passeio (cilindrada/marca)
-// só filtram quando o perfil do utilizador tem esse dado preenchido — um perfil
-// incompleto não é escondido dos passeios, apenas fica sem a validação automática.
+// só filtram quando o utilizador tem pelo menos uma mota registada que os
+// contrarie — sem motas registadas, não se filtra nada (evita esconder
+// passeios por falta de dados, não por falta de elegibilidade real). Com
+// várias motas, basta UMA cumprir os critérios para o passeio aparecer.
 export async function listarPasseiosVisiveis() {
   const supabase = await createClient()
   const user = await obterUtilizadorAutenticado()
   if (!user) return []
 
-  const { data: perfil } = await supabase
-    .from('perfis')
-    .select('cilindrada_cc, marca_moto')
-    .eq('id', user.id)
-    .maybeSingle()
+  const { data: motas } = await supabase
+    .from('motas')
+    .select('cilindrada_cc, marca')
+    .eq('utilizador_id', user.id)
 
   const { data: passeios } = await supabase
     .from('passeios')
@@ -104,14 +105,19 @@ export async function listarPasseiosVisiveis() {
   if (!passeios) return []
 
   return (passeios as Passeio[]).filter((p) => {
-    if (perfil?.cilindrada_cc != null) {
-      if (p.cilindrada_min != null && perfil.cilindrada_cc < p.cilindrada_min) return false
-      if (p.cilindrada_max != null && perfil.cilindrada_cc > p.cilindrada_max) return false
-    }
-    if (perfil?.marca_moto && p.marca && perfil.marca_moto.toLowerCase() !== p.marca.toLowerCase()) {
-      return false
-    }
-    return true
+    if (!motas || motas.length === 0) return true
+    if (p.cilindrada_min == null && p.cilindrada_max == null && !p.marca) return true
+
+    return motas.some((mota) => {
+      if (mota.cilindrada_cc != null) {
+        if (p.cilindrada_min != null && mota.cilindrada_cc < p.cilindrada_min) return false
+        if (p.cilindrada_max != null && mota.cilindrada_cc > p.cilindrada_max) return false
+      }
+      if (mota.marca && p.marca && mota.marca.toLowerCase() !== p.marca.toLowerCase()) {
+        return false
+      }
+      return true
+    })
   })
 }
 

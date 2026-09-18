@@ -5,15 +5,18 @@ import {
   actualizarPerfil,
   associarAClube,
 } from '@/lib/data/clube'
+import { listarMinhasMotas, adicionarMota, removerMota } from '@/lib/data/motas'
 import { ActivarNotificacoes } from '@/components/ActivarNotificacoes'
 import { FormularioPerfil } from '@/components/FormularioPerfil'
 import { BotaoAssociarClube } from '@/components/BotaoAssociarClube'
+import { GestaoMotas } from '@/components/GestaoMotas'
 
 export default async function PaginaPerfil() {
-  const [perfil, clubes, adesoes] = await Promise.all([
+  const [perfil, clubes, adesoes, motas] = await Promise.all([
     obterMeuPerfil(),
     listarClubes(),
     obterMinhasAdesoes(),
+    listarMinhasMotas(),
   ])
 
   const idsClubesAssociados = new Set(adesoes.map((a) => a.clube_id))
@@ -23,6 +26,11 @@ export default async function PaginaPerfil() {
       <section>
         <h1 className="mb-4 text-xl font-bold">O meu perfil</h1>
         <FormularioPerfil action={actualizarPerfil} perfil={perfil} />
+      </section>
+
+      <section>
+        <h2 className="mb-2 font-medium">As minhas motas</h2>
+        <GestaoMotas motas={motas} adicionar={adicionarMota} remover={removerMota} />
       </section>
 
       <section>

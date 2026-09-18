@@ -26,8 +26,16 @@ export type Perfil = {
   contacto: string | null
   nif: string | null
   tipo_perfil: TipoPerfil
+  created_at: string
+}
+
+export type Mota = {
+  id: string
+  utilizador_id: string
+  marca: string
+  modelo: string | null
+  ano: number | null
   cilindrada_cc: number | null
-  marca_moto: string | null
   created_at: string
 }
 
@@ -120,6 +128,12 @@ export type Database = {
         Row: PushSubscriptionRow
         Insert: Partial<PushSubscriptionRow>
         Update: Partial<PushSubscriptionRow>
+        Relationships: []
+      }
+      motas: {
+        Row: Mota
+        Insert: Partial<Mota> & { utilizador_id: string; marca: string }
+        Update: Partial<Mota>
         Relationships: []
       }
     }
