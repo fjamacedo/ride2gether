@@ -58,7 +58,8 @@ export default function PaginaRegisto() {
 
         <p className="text-xs text-neutral-500">
           Depois de criares a conta, vais receber um e-mail de confirmação — só consegues entrar
-          depois de confirmares.
+          depois de confirmares. Se não aparecer na caixa de entrada, verifica a pasta de
+          spam/lixo.
         </p>
 
         {estado.erro && <p className="text-sm text-red-600">{estado.erro}</p>}

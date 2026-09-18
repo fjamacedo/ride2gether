@@ -48,7 +48,7 @@ export async function registar(
   // omissão da Supabase); com auto-confirm activo, já vem sessão e entra logo.
   if (!data.session) {
     return {
-      mensagem: `Conta criada. Enviámos um e-mail de confirmação para ${dados.data.email} — confirma antes de entrares.`,
+      mensagem: `Conta criada. Enviámos um e-mail de confirmação para ${dados.data.email} — confirma antes de entrares (verifica também a pasta de spam/lixo).`,
     }
   }
 
