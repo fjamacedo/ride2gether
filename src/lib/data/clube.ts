@@ -13,6 +13,15 @@ export async function obterUtilizadorAutenticado() {
   return user
 }
 
+export async function obterMeuPerfil() {
+  const supabase = await createClient()
+  const user = await obterUtilizadorAutenticado()
+  if (!user) return null
+
+  const { data } = await supabase.from('perfis').select('*').eq('id', user.id).maybeSingle()
+  return data
+}
+
 export async function obterClubeQueDirijo() {
   const supabase = await createClient()
   const user = await obterUtilizadorAutenticado()
@@ -125,6 +134,84 @@ export async function actualizarEstadoSocio(
     .eq('utilizador_id', utilizadorId)
 
   revalidatePath('/dashboard/socios')
+}
+
+export async function listarClubes() {
+  const supabase = await createClient()
+  const { data } = await supabase.from('clubes').select('id, nome, localizacao').order('nome')
+  return data ?? []
+}
+
+export async function obterMinhasAdesoes() {
+  const user = await obterUtilizadorAutenticado()
+  if (!user) return []
+
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('clube_membros')
+    .select('clube_id, estado, clubes:clube_id(id, nome)')
+    .eq('utilizador_id', user.id)
+
+  return data ?? []
+}
+
+export async function associarAClube(clubeId: string) {
+  const user = await obterUtilizadorAutenticado()
+  if (!user) return { erro: 'Sessão expirada, entra novamente.' }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('clube_membros')
+    .insert({ clube_id: clubeId, utilizador_id: user.id, estado: 'activo' })
+
+  if (error) {
+    return { erro: error.code === '23505' ? 'Já és sócio deste clube.' : error.message }
+  }
+
+  revalidatePath('/perfil')
+  return {}
+}
+
+const esquemaPerfil = z.object({
+  nome: z.string().min(2, 'Indica o teu nome'),
+  contacto: z.string().optional(),
+  cilindrada_cc: z.string().optional(),
+  marca_moto: z.string().optional(),
+})
+
+export async function actualizarPerfil(
+  _estadoAnterior: EstadoFormulario,
+  formData: FormData
+): Promise<EstadoFormulario> {
+  const user = await obterUtilizadorAutenticado()
+  if (!user) return { erro: 'Sessão expirada, entra novamente.' }
+
+  const dados = esquemaPerfil.safeParse({
+    nome: formData.get('nome'),
+    contacto: formData.get('contacto'),
+    cilindrada_cc: formData.get('cilindrada_cc'),
+    marca_moto: formData.get('marca_moto'),
+  })
+  if (!dados.success) {
+    return { erro: dados.error.issues[0]?.message ?? 'Dados inválidos' }
+  }
+
+  const supabase = await createClient()
+  const cilindrada = dados.data.cilindrada_cc ? Number(dados.data.cilindrada_cc) : null
+  const { error } = await supabase
+    .from('perfis')
+    .update({
+      nome: dados.data.nome,
+      contacto: dados.data.contacto || null,
+      cilindrada_cc: Number.isFinite(cilindrada) ? cilindrada : null,
+      marca_moto: dados.data.marca_moto || null,
+    })
+    .eq('id', user.id)
+
+  if (error) return { erro: error.message }
+
+  revalidatePath('/perfil')
+  return {}
 }
 
 export async function removerSocio(clubeId: string, utilizadorId: string) {

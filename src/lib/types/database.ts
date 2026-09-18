@@ -13,7 +13,14 @@ export type AmbitoVisibilidade =
   | 'publico'
 export type EstadoInscricao = 'inscrito' | 'confirmado'
 
-export interface Perfil {
+// Nota: usar `type` em TODOS estes tipos (nunca `interface`) — com a versão
+// instalada do @supabase/supabase-js (2.116), passar um tipo Row/Insert/Update
+// declarado com `interface` faz o TypeScript desistir silenciosamente da
+// inferência genérica em `.from()`/`.select()`, colapsando tudo para `never`
+// SEM reportar erro (confirmado por reprodução isolada: com `interface`,
+// `.from('tabela_que_nao_existe')` nem sequer acusava erro). `type` resolve.
+
+export type Perfil = {
   id: string
   nome: string
   contacto: string | null
@@ -24,7 +31,7 @@ export interface Perfil {
   created_at: string
 }
 
-export interface Clube {
+export type Clube = {
   id: string
   nome: string
   localizacao: string | null
@@ -33,14 +40,14 @@ export interface Clube {
   data_registo: string
 }
 
-export interface ClubeMembro {
+export type ClubeMembro = {
   clube_id: string
   utilizador_id: string
   estado: EstadoMembro
   data_adesao: string
 }
 
-export interface Passeio {
+export type Passeio = {
   id: string
   organizador_clube_id: string | null
   organizador_utilizador_id: string | null
@@ -57,7 +64,7 @@ export interface Passeio {
   created_at: string
 }
 
-export interface Inscricao {
+export type Inscricao = {
   id: string
   passeio_id: string
   utilizador_id: string
@@ -65,7 +72,7 @@ export interface Inscricao {
   created_at: string
 }
 
-export interface PushSubscriptionRow {
+export type PushSubscriptionRow = {
   id: string
   utilizador_id: string
   endpoint: string
@@ -73,24 +80,68 @@ export interface PushSubscriptionRow {
   auth: string
   created_at: string
 }
-
-export interface Database {
+export type Database = {
+  __InternalSupabase: {
+    PostgrestVersion: '13'
+  }
   public: {
     Tables: {
-      perfis: { Row: Perfil; Insert: Partial<Perfil> & { id: string }; Update: Partial<Perfil> }
-      clubes: { Row: Clube; Insert: Partial<Clube>; Update: Partial<Clube> }
+      perfis: {
+        Row: Perfil
+        Insert: Partial<Perfil> & { id: string }
+        Update: Partial<Perfil>
+        Relationships: []
+      }
+      clubes: {
+        Row: Clube
+        Insert: Partial<Clube>
+        Update: Partial<Clube>
+        Relationships: []
+      }
       clube_membros: {
         Row: ClubeMembro
         Insert: Partial<ClubeMembro>
         Update: Partial<ClubeMembro>
+        Relationships: []
       }
-      passeios: { Row: Passeio; Insert: Partial<Passeio>; Update: Partial<Passeio> }
-      inscricoes: { Row: Inscricao; Insert: Partial<Inscricao>; Update: Partial<Inscricao> }
+      passeios: {
+        Row: Passeio
+        Insert: Partial<Passeio>
+        Update: Partial<Passeio>
+        Relationships: []
+      }
+      inscricoes: {
+        Row: Inscricao
+        Insert: Partial<Inscricao>
+        Update: Partial<Inscricao>
+        Relationships: []
+      }
       push_subscriptions: {
         Row: PushSubscriptionRow
         Insert: Partial<PushSubscriptionRow>
         Update: Partial<PushSubscriptionRow>
+        Relationships: []
       }
     }
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- {} (não Record<string, never>) é necessário aqui; ver nota acima
+    Views: {}
+    Functions: {
+      procurar_perfil_por_email: {
+        Args: { p_email: string }
+        Returns: { id: string; nome: string }[]
+      }
+      e_membro_activo: {
+        Args: { p_clube_id: string; p_utilizador_id: string }
+        Returns: boolean
+      }
+      dirige_clube: {
+        Args: { p_clube_id: string; p_utilizador_id: string }
+        Returns: boolean
+      }
+    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- {} (não Record<string, never>) é necessário aqui; ver nota acima
+    Enums: {}
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- {} (não Record<string, never>) é necessário aqui; ver nota acima
+    CompositeTypes: {}
   }
 }

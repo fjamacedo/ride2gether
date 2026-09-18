@@ -1,0 +1,64 @@
+import {
+  obterMeuPerfil,
+  listarClubes,
+  obterMinhasAdesoes,
+  actualizarPerfil,
+  associarAClube,
+} from '@/lib/data/clube'
+import { ActivarNotificacoes } from '@/components/ActivarNotificacoes'
+import { FormularioPerfil } from '@/components/FormularioPerfil'
+import { BotaoAssociarClube } from '@/components/BotaoAssociarClube'
+
+export default async function PaginaPerfil() {
+  const [perfil, clubes, adesoes] = await Promise.all([
+    obterMeuPerfil(),
+    listarClubes(),
+    obterMinhasAdesoes(),
+  ])
+
+  const idsClubesAssociados = new Set(adesoes.map((a) => a.clube_id))
+
+  return (
+    <div className="mx-auto flex max-w-2xl flex-col gap-8 px-4 py-6">
+      <section>
+        <h1 className="mb-4 text-xl font-bold">O meu perfil</h1>
+        <FormularioPerfil action={actualizarPerfil} perfil={perfil} />
+      </section>
+
+      <section>
+        <h2 className="mb-2 font-medium">Notificações</h2>
+        <ActivarNotificacoes />
+      </section>
+
+      <section>
+        <h2 className="mb-2 font-medium">Clubes</h2>
+        {adesoes.length > 0 && (
+          <ul className="mb-3 flex flex-col gap-1 text-sm">
+            {adesoes.map((a) => (
+              <li key={a.clube_id}>
+                {(a.clubes as { nome?: string } | null)?.nome} — {a.estado}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <p className="mb-2 text-sm text-neutral-500">Associar-me a um clube:</p>
+        <ul className="flex flex-col gap-2">
+          {clubes
+            .filter((c) => !idsClubesAssociados.has(c.id))
+            .map((c) => (
+              <li key={c.id} className="flex items-center justify-between rounded border px-3 py-2">
+                <span>
+                  {c.nome}
+                  {c.localizacao && (
+                    <span className="text-neutral-500"> — {c.localizacao}</span>
+                  )}
+                </span>
+                <BotaoAssociarClube clubeId={c.id} action={associarAClube} />
+              </li>
+            ))}
+        </ul>
+      </section>
+    </div>
+  )
+}
