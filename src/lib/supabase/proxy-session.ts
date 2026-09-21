@@ -33,6 +33,12 @@ export async function updateSession(request: NextRequest) {
   const rotaPublica =
     request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/registo') ||
+    request.nextUrl.pathname.startsWith('/recuperar-password') ||
+    // /redefinir-password tem de ficar acessível sem sessão "visível" ao
+    // proxy: a sessão de recuperação chega num fragmento (#access_token=...)
+    // da URL, que o browser nunca envia ao servidor — só o JS do lado do
+    // cliente a consegue processar depois da página carregar.
+    request.nextUrl.pathname.startsWith('/redefinir-password') ||
     request.nextUrl.pathname === '/'
 
   if (!user && !rotaPublica) {

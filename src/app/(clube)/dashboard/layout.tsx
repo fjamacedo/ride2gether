@@ -1,13 +1,13 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { obterUtilizadorAutenticado, obterClubeQueDirijo } from '@/lib/data/clube'
+import { obterUtilizadorAutenticado, obterClubeQueDirijo, obterMeuPerfil } from '@/lib/data/clube'
 import { terminarSessao } from '@/lib/auth/actions'
 
 export default async function LayoutDashboard({ children }: { children: React.ReactNode }) {
   const user = await obterUtilizadorAutenticado()
   if (!user) redirect('/login')
 
-  const clube = await obterClubeQueDirijo()
+  const [clube, perfil] = await Promise.all([obterClubeQueDirijo(), obterMeuPerfil()])
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -19,6 +19,7 @@ export default async function LayoutDashboard({ children }: { children: React.Re
           <Link href="/passeios" className="underline">
             Ver como motard
           </Link>
+          {perfil?.nome && <span className="text-neutral-600">{perfil.nome}</span>}
           <form action={terminarSessao}>
             <button type="submit" className="text-neutral-500">
               Sair

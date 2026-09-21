@@ -27,6 +27,10 @@ export default function PaginaLogin() {
           <input name="password" type="password" required className="rounded border px-3 py-2" />
         </label>
 
+        <Link href="/recuperar-password" className="-mt-2 text-xs underline self-start">
+          Esqueceste a password?
+        </Link>
+
         {estado.erro && (
           <div className="text-sm text-red-600">
             <p>{estado.erro}</p>

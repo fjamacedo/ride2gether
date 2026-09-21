@@ -1,6 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 
@@ -81,6 +82,34 @@ export async function login(
   }
 
   redirect('/passeios')
+}
+
+const esquemaRecuperarPassword = z.object({
+  email: z.string().email('E-mail inválido'),
+})
+
+export async function pedirRecuperacaoPassword(
+  _estadoAnterior: EstadoFormulario,
+  formData: FormData
+): Promise<EstadoFormulario> {
+  const dados = esquemaRecuperarPassword.safeParse({ email: formData.get('email') })
+  if (!dados.success) {
+    return { erro: dados.error.issues[0]?.message ?? 'Dados inválidos' }
+  }
+
+  const host = (await headers()).get('host')
+  const supabase = await createClient()
+
+  // O resultado é sempre a mesma mensagem, exista ou não conta com este
+  // e-mail — evita revelar a terceiros que e-mails estão registados.
+  await supabase.auth.resetPasswordForEmail(dados.data.email, {
+    redirectTo: `https://${host}/redefinir-password`,
+  })
+
+  return {
+    mensagem:
+      'Se existir uma conta com esse e-mail, enviámos um link para redefinires a password (verifica também o spam/lixo).',
+  }
 }
 
 export async function terminarSessao() {

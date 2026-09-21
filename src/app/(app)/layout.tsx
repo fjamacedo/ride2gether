@@ -18,6 +18,7 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
               Gestão do clube
             </Link>
           )}
+          {perfil?.nome && <span className="text-neutral-600">{perfil.nome}</span>}
           <form action={terminarSessao}>
             <button type="submit" className="text-neutral-500">
               Sair
