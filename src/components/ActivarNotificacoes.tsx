@@ -76,14 +76,14 @@ export function ActivarNotificacoes() {
   }
 
   if (estado === 'activo') {
-    return <p className="text-sm text-green-700">Notificações activas ✓</p>
+    return <p className="text-sm text-ride-green-dark">Notificações activas ✓</p>
   }
 
   return (
     <button
       onClick={activar}
       disabled={estado === 'a_activar'}
-      className="rounded border px-3 py-2 text-sm disabled:opacity-50"
+      className="rounded border border-ride-green px-3 py-2 text-sm text-ride-green transition hover:bg-ride-green hover:text-white disabled:opacity-50"
     >
       {estado === 'a_activar' ? 'A activar…' : 'Activar notificações'}
     </button>

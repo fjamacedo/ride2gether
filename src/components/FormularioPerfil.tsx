@@ -17,31 +17,31 @@ export function FormularioPerfil({
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="flex flex-col gap-1 text-sm text-neutral-700">
         Nome
         <input
           name="nome"
           required
           defaultValue={perfil?.nome ?? ''}
-          className="rounded border px-3 py-2"
+          className="rounded border border-neutral-300 px-3 py-2 focus:border-ride-green focus:outline-none focus:ring-1 focus:ring-ride-green"
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="flex flex-col gap-1 text-sm text-neutral-700">
         Contacto
         <input
           name="contacto"
           defaultValue={perfil?.contacto ?? ''}
-          className="rounded border px-3 py-2"
+          className="rounded border border-neutral-300 px-3 py-2 focus:border-ride-green focus:outline-none focus:ring-1 focus:ring-ride-green"
         />
       </label>
 
-      {estado.erro && <p className="text-sm text-red-600">{estado.erro}</p>}
+      {estado.erro && <p className="text-sm text-ride-red">{estado.erro}</p>}
 
       <button
         type="submit"
         disabled={aPendente}
-        className="self-start rounded bg-black px-3 py-2 text-sm text-white disabled:opacity-50"
+        className="self-start rounded bg-ride-green px-3 py-2 text-sm font-medium text-white transition hover:bg-ride-green-dark disabled:opacity-50"
       >
         {aPendente ? 'A guardar…' : 'Guardar'}
       </button>

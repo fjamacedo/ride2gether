@@ -24,11 +24,11 @@ export function BotaoAssociarClube({
             if (resultado?.erro) setErro(resultado.erro)
           })
         }
-        className="rounded border px-3 py-1 text-sm disabled:opacity-50"
+        className="rounded border border-ride-green px-3 py-1 text-sm text-ride-green transition hover:bg-ride-green hover:text-white disabled:opacity-50"
       >
         {aPendente ? 'A associar…' : 'Associar-me'}
       </button>
-      {erro && <p className="text-xs text-red-600">{erro}</p>}
+      {erro && <p className="text-xs text-ride-red">{erro}</p>}
     </div>
   )
 }

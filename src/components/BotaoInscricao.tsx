@@ -23,7 +23,7 @@ export function BotaoInscricao({
             await cancelarInscricao(passeioId)
           })
         }
-        className="rounded border px-4 py-2 text-sm disabled:opacity-50"
+        className="rounded border border-ride-red text-ride-red px-4 py-2 text-sm transition hover:bg-ride-red hover:text-white disabled:opacity-50"
       >
         {aPendente ? 'A cancelar…' : 'Cancelar inscrição'}
       </button>
@@ -41,11 +41,11 @@ export function BotaoInscricao({
             if (resultado?.erro) setErro(resultado.erro)
           })
         }
-        className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
+        className="rounded bg-ride-green px-4 py-2 text-sm font-medium text-white transition hover:bg-ride-green-dark disabled:opacity-50"
       >
         {aPendente ? 'A inscrever…' : 'Inscrever-me'}
       </button>
-      {erro && <p className="text-sm text-red-600">{erro}</p>}
+      {erro && <p className="text-sm text-ride-red">{erro}</p>}
     </div>
   )
 }

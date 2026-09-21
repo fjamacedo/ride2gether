@@ -24,14 +24,14 @@ export function AccoesSocio({
       <button
         disabled={aPendente}
         onClick={() => iniciarTransicao(() => actualizarEstado(clubeId, utilizadorId, novoEstado))}
-        className="rounded border px-2 py-1 disabled:opacity-50"
+        className="rounded border border-neutral-300 px-2 py-1 text-neutral-700 transition hover:border-ride-green hover:text-ride-green disabled:opacity-50"
       >
         Marcar {novoEstado}
       </button>
       <button
         disabled={aPendente}
         onClick={() => iniciarTransicao(() => remover(clubeId, utilizadorId))}
-        className="rounded border border-red-300 px-2 py-1 text-red-600 disabled:opacity-50"
+        className="rounded border border-ride-red/40 px-2 py-1 text-ride-red transition hover:bg-ride-red hover:text-white disabled:opacity-50"
       >
         Remover
       </button>

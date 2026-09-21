@@ -6,6 +6,9 @@ import type { Mota } from '@/lib/types/database'
 
 const estadoInicial: EstadoFormulario = {}
 
+const classeInput =
+  'rounded border border-neutral-300 px-3 py-2 focus:border-ride-green focus:outline-none focus:ring-1 focus:ring-ride-green'
+
 export function GestaoMotas({
   motas,
   adicionar,
@@ -25,9 +28,9 @@ export function GestaoMotas({
           {motas.map((mota) => (
             <li
               key={mota.id}
-              className="flex items-center justify-between rounded border px-3 py-2 text-sm"
+              className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm shadow-sm"
             >
-              <span>
+              <span className="text-neutral-800">
                 {mota.marca}
                 {mota.modelo ? ` ${mota.modelo}` : ''}
                 {mota.ano ? ` (${mota.ano})` : ''}
@@ -36,7 +39,7 @@ export function GestaoMotas({
               <button
                 disabled={aRemover}
                 onClick={() => iniciarRemocao(() => remover(mota.id))}
-                className="text-red-600 disabled:opacity-50"
+                className="text-ride-red disabled:opacity-50"
               >
                 Remover
               </button>
@@ -46,45 +49,43 @@ export function GestaoMotas({
       )}
 
       {motas.length < 2 ? (
-        <form action={formAction} className="flex flex-col gap-3 rounded border p-3">
+        <form
+          action={formAction}
+          className="flex flex-col gap-3 rounded-lg border border-neutral-200 bg-white p-3"
+        >
           <p className="text-xs text-neutral-500">
             Podes registar até 2 motas ({motas.length}/2). Usadas para filtrar automaticamente os
             passeios com critérios de elegibilidade.
           </p>
 
           <div className="flex gap-3">
-            <label className="flex flex-1 flex-col gap-1 text-sm">
+            <label className="flex flex-1 flex-col gap-1 text-sm text-neutral-700">
               Marca
-              <input name="marca" required className="rounded border px-3 py-2" />
+              <input name="marca" required className={classeInput} />
             </label>
-            <label className="flex flex-1 flex-col gap-1 text-sm">
+            <label className="flex flex-1 flex-col gap-1 text-sm text-neutral-700">
               Modelo
-              <input name="modelo" className="rounded border px-3 py-2" />
+              <input name="modelo" className={classeInput} />
             </label>
           </div>
 
           <div className="flex gap-3">
-            <label className="flex flex-1 flex-col gap-1 text-sm">
+            <label className="flex flex-1 flex-col gap-1 text-sm text-neutral-700">
               Ano
-              <input name="ano" type="number" min={1900} className="rounded border px-3 py-2" />
+              <input name="ano" type="number" min={1900} className={classeInput} />
             </label>
-            <label className="flex flex-1 flex-col gap-1 text-sm">
+            <label className="flex flex-1 flex-col gap-1 text-sm text-neutral-700">
               Cilindrada (cc)
-              <input
-                name="cilindrada_cc"
-                type="number"
-                min={0}
-                className="rounded border px-3 py-2"
-              />
+              <input name="cilindrada_cc" type="number" min={0} className={classeInput} />
             </label>
           </div>
 
-          {estado.erro && <p className="text-sm text-red-600">{estado.erro}</p>}
+          {estado.erro && <p className="text-sm text-ride-red">{estado.erro}</p>}
 
           <button
             type="submit"
             disabled={aPendente}
-            className="self-start rounded bg-black px-3 py-2 text-sm text-white disabled:opacity-50"
+            className="self-start rounded bg-ride-green px-3 py-2 text-sm font-medium text-white transition hover:bg-ride-green-dark disabled:opacity-50"
           >
             {aPendente ? 'A adicionar…' : 'Adicionar mota'}
           </button>

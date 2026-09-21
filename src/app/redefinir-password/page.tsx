@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { AuthShell } from '@/components/AuthShell'
+import { Logo } from '@/components/Logo'
 
 export default function PaginaRedefinirPassword() {
   const [estadoSessao, setEstadoSessao] = useState<'a_verificar' | 'pronta' | 'invalida'>(
@@ -58,32 +60,38 @@ export default function PaginaRedefinirPassword() {
 
   if (estadoSessao === 'a_verificar') {
     return (
-      <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center px-4">
-        <p className="text-sm text-neutral-500">A verificar o link…</p>
-      </main>
+      <AuthShell>
+        <p className="text-center text-sm text-neutral-500">A verificar o link…</p>
+      </AuthShell>
     )
   }
 
   if (estadoSessao === 'invalida') {
     return (
-      <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-4 px-4">
-        <h1 className="text-2xl font-bold">Link inválido ou expirado</h1>
-        <p className="text-sm text-neutral-600">
-          Este link de recuperação já não é válido. Pede um novo.
-        </p>
-        <Link href="/recuperar-password" className="underline">
-          Pedir novo link
-        </Link>
-      </main>
+      <AuthShell>
+        <div className="flex flex-col items-center gap-4 text-center">
+          <Logo tamanho="sm" />
+          <h1 className="text-xl font-bold text-neutral-900">Link inválido ou expirado</h1>
+          <p className="text-sm text-neutral-600">
+            Este link de recuperação já não é válido. Pede um novo.
+          </p>
+          <Link href="/recuperar-password" className="text-ride-green underline underline-offset-2">
+            Pedir novo link
+          </Link>
+        </div>
+      </AuthShell>
     )
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-6 px-4">
-      <h1 className="text-2xl font-bold">Definir nova password</h1>
+    <AuthShell>
+      <div className="mb-6 flex flex-col items-center gap-2 text-center">
+        <Logo tamanho="sm" />
+        <h1 className="text-xl font-bold text-neutral-900">Definir nova password</h1>
+      </div>
 
       <form onSubmit={submeter} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-sm text-neutral-700">
           Nova password
           <input
             type="password"
@@ -91,20 +99,20 @@ export default function PaginaRedefinirPassword() {
             minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="rounded border px-3 py-2"
+            className="rounded border border-neutral-300 px-3 py-2 focus:border-ride-green focus:outline-none focus:ring-1 focus:ring-ride-green"
           />
         </label>
 
-        {erro && <p className="text-sm text-red-600">{erro}</p>}
+        {erro && <p className="text-sm text-ride-red">{erro}</p>}
 
         <button
           type="submit"
           disabled={aGuardar}
-          className="rounded bg-black px-3 py-2 text-white disabled:opacity-50"
+          className="rounded bg-ride-green px-3 py-2 font-medium text-white transition hover:bg-ride-green-dark disabled:opacity-50"
         >
           {aGuardar ? 'A guardar…' : 'Guardar nova password'}
         </button>
       </form>
-    </main>
+    </AuthShell>
   )
 }

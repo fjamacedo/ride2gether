@@ -30,24 +30,24 @@ export function FormularioAdicionarSocio({
       }}
       className="flex items-end gap-2"
     >
-      <label className="flex flex-1 flex-col gap-1 text-sm">
+      <label className="flex flex-1 flex-col gap-1 text-sm text-neutral-700">
         Adicionar sócio pelo e-mail
         <input
           name="email"
           type="email"
           required
           placeholder="socio@exemplo.pt"
-          className="rounded border px-3 py-2"
+          className="rounded border border-neutral-300 px-3 py-2 focus:border-ride-green focus:outline-none focus:ring-1 focus:ring-ride-green"
         />
       </label>
       <button
         type="submit"
         disabled={aPendente}
-        className="rounded bg-black px-3 py-2 text-sm text-white disabled:opacity-50"
+        className="rounded bg-ride-green px-3 py-2 text-sm font-medium text-white transition hover:bg-ride-green-dark disabled:opacity-50"
       >
         {aPendente ? 'A adicionar…' : 'Adicionar'}
       </button>
-      {erro && <p className="text-sm text-red-600">{erro}</p>}
+      {erro && <p className="text-sm text-ride-red">{erro}</p>}
     </form>
   )
 }

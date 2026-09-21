@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import type { EmailOtpType } from '@supabase/supabase-js'
+import { AuthShell } from '@/components/AuthShell'
+import { Logo } from '@/components/Logo'
 
 function ConteudoConfirmacao() {
   const searchParams = useSearchParams()
@@ -17,15 +19,16 @@ function ConteudoConfirmacao() {
 
   if (!tokenHash || !type) {
     return (
-      <>
-        <h1 className="text-2xl font-bold">Link inválido</h1>
+      <div className="flex flex-col items-center gap-3 text-center">
+        <Logo tamanho="sm" />
+        <h1 className="text-xl font-bold text-neutral-900">Link inválido</h1>
         <p className="text-sm text-neutral-600">
           Este link está incompleto ou corrompido. Pede um novo.
         </p>
-        <Link href="/recuperar-password" className="underline">
+        <Link href="/recuperar-password" className="text-ride-green underline underline-offset-2">
           Pedir novo link
         </Link>
-      </>
+      </div>
     )
   }
 
@@ -49,16 +52,17 @@ function ConteudoConfirmacao() {
   }
 
   return (
-    <>
-      <h1 className="text-2xl font-bold">Confirmar</h1>
+    <div className="flex flex-col items-center gap-4 text-center">
+      <Logo tamanho="sm" />
+      <h1 className="text-xl font-bold text-neutral-900">Confirmar</h1>
       <p className="text-sm text-neutral-600">
         Por segurança, confirma que foste tu que pediste isto clicando no botão abaixo.
       </p>
 
       {erro && (
-        <div className="text-sm text-red-600">
+        <div className="text-sm text-ride-red">
           <p>{erro}</p>
-          <Link href="/recuperar-password" className="underline">
+          <Link href="/recuperar-password" className="text-ride-green underline underline-offset-2">
             Pedir novo link
           </Link>
         </div>
@@ -67,20 +71,20 @@ function ConteudoConfirmacao() {
       <button
         onClick={confirmar}
         disabled={aConfirmar}
-        className="rounded bg-black px-3 py-2 text-white disabled:opacity-50"
+        className="rounded bg-ride-green px-4 py-2 font-medium text-white transition hover:bg-ride-green-dark disabled:opacity-50"
       >
         {aConfirmar ? 'A confirmar…' : 'Confirmar'}
       </button>
-    </>
+    </div>
   )
 }
 
 export default function PaginaConfirmarLink() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-4 px-4">
-      <Suspense fallback={<p className="text-sm text-neutral-500">A carregar…</p>}>
+    <AuthShell>
+      <Suspense fallback={<p className="text-center text-sm text-neutral-500">A carregar…</p>}>
         <ConteudoConfirmacao />
       </Suspense>
-    </main>
+    </AuthShell>
   )
 }

@@ -3,6 +3,8 @@
 import { useActionState } from 'react'
 import Link from 'next/link'
 import { login, type EstadoFormulario } from '@/lib/auth/actions'
+import { AuthShell } from '@/components/AuthShell'
+import { Logo } from '@/components/Logo'
 
 const estadoInicial: EstadoFormulario = {}
 
@@ -10,29 +12,42 @@ export default function PaginaLogin() {
   const [estado, formAction, aPendente] = useActionState(login, estadoInicial)
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-6 px-4">
-      <div>
-        <h1 className="text-2xl font-bold">Entrar</h1>
-        <p className="text-sm text-neutral-600">Ride2gether</p>
+    <AuthShell>
+      <div className="mb-6 flex flex-col items-center gap-2 text-center">
+        <Logo tamanho="sm" />
+        <h1 className="text-xl font-bold text-neutral-900">Entrar</h1>
       </div>
 
       <form action={formAction} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-sm text-neutral-700">
           E-mail
-          <input name="email" type="email" required className="rounded border px-3 py-2" />
+          <input
+            name="email"
+            type="email"
+            required
+            className="rounded border border-neutral-300 px-3 py-2 focus:border-ride-green focus:outline-none focus:ring-1 focus:ring-ride-green"
+          />
         </label>
 
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-sm text-neutral-700">
           Password
-          <input name="password" type="password" required className="rounded border px-3 py-2" />
+          <input
+            name="password"
+            type="password"
+            required
+            className="rounded border border-neutral-300 px-3 py-2 focus:border-ride-green focus:outline-none focus:ring-1 focus:ring-ride-green"
+          />
         </label>
 
-        <Link href="/recuperar-password" className="-mt-2 text-xs underline self-start">
+        <Link
+          href="/recuperar-password"
+          className="-mt-2 self-start text-xs text-ride-green underline underline-offset-2"
+        >
           Esqueceste a password?
         </Link>
 
         {estado.erro && (
-          <div className="text-sm text-red-600">
+          <div className="text-sm text-ride-red">
             <p>{estado.erro}</p>
             <p className="mt-1 text-xs text-neutral-500">
               Se acabaste de te registares, confirma primeiro o e-mail que te enviámos.
@@ -43,18 +58,18 @@ export default function PaginaLogin() {
         <button
           type="submit"
           disabled={aPendente}
-          className="rounded bg-black px-3 py-2 text-white disabled:opacity-50"
+          className="rounded bg-ride-green px-3 py-2 font-medium text-white transition hover:bg-ride-green-dark disabled:opacity-50"
         >
           {aPendente ? 'A entrar…' : 'Entrar'}
         </button>
       </form>
 
-      <p className="text-sm">
+      <p className="mt-6 text-center text-sm text-neutral-600">
         Ainda não tens conta?{' '}
-        <Link href="/registo" className="underline">
+        <Link href="/registo" className="text-ride-green underline underline-offset-2">
           Criar conta
         </Link>
       </p>
-    </main>
+    </AuthShell>
   )
 }

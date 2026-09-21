@@ -24,24 +24,24 @@ export default async function PaginaPerfil() {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-8 px-4 py-6">
       <section>
-        <h1 className="mb-4 text-xl font-bold">O meu perfil</h1>
+        <h1 className="mb-4 text-xl font-bold text-neutral-900">O meu perfil</h1>
         <FormularioPerfil action={actualizarPerfil} perfil={perfil} />
       </section>
 
       <section>
-        <h2 className="mb-2 font-medium">As minhas motas</h2>
+        <h2 className="mb-2 font-medium text-neutral-900">As minhas motas</h2>
         <GestaoMotas motas={motas} adicionar={adicionarMota} remover={removerMota} />
       </section>
 
       <section>
-        <h2 className="mb-2 font-medium">Notificações</h2>
+        <h2 className="mb-2 font-medium text-neutral-900">Notificações</h2>
         <ActivarNotificacoes />
       </section>
 
       <section>
-        <h2 className="mb-2 font-medium">Clubes</h2>
+        <h2 className="mb-2 font-medium text-neutral-900">Clubes</h2>
         {adesoes.length > 0 && (
-          <ul className="mb-3 flex flex-col gap-1 text-sm">
+          <ul className="mb-3 flex flex-col gap-1 text-sm text-neutral-700">
             {adesoes.map((a) => (
               <li key={a.clube_id}>
                 {(a.clubes as { nome?: string } | null)?.nome} — {a.estado}
@@ -55,8 +55,11 @@ export default async function PaginaPerfil() {
           {clubes
             .filter((c) => !idsClubesAssociados.has(c.id))
             .map((c) => (
-              <li key={c.id} className="flex items-center justify-between rounded border px-3 py-2">
-                <span>
+              <li
+                key={c.id}
+                className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white px-3 py-2 shadow-sm"
+              >
+                <span className="text-neutral-800">
                   {c.nome}
                   {c.localizacao && (
                     <span className="text-neutral-500"> — {c.localizacao}</span>
