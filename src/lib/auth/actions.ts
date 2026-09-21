@@ -32,6 +32,10 @@ export async function registar(
     return { erro: dados.error.issues[0]?.message ?? 'Dados inválidos' }
   }
 
+  if (formData.get('aceitar_termos') !== 'on') {
+    return { erro: 'Tens de aceitar os Termos de Utilização e a Política de Privacidade.' }
+  }
+
   const supabase = await createClient()
   const { data, error } = await supabase.auth.signUp({
     email: dados.data.email,

@@ -83,6 +83,21 @@ export default function PaginaRegisto() {
           spam/lixo.
         </p>
 
+        <label className="flex items-start gap-2 text-xs text-neutral-700">
+          <input type="checkbox" name="aceitar_termos" required className="mt-0.5 accent-ride-green" />
+          <span>
+            Li e aceito os{' '}
+            <Link href="/termos" target="_blank" className="text-ride-green underline">
+              Termos de Utilização
+            </Link>{' '}
+            e a{' '}
+            <Link href="/privacidade" target="_blank" className="text-ride-green underline">
+              Política de Privacidade
+            </Link>
+            .
+          </span>
+        </label>
+
         {estado.erro && <p className="text-sm text-ride-red">{estado.erro}</p>}
         {estado.mensagem && <p className="text-sm text-ride-green-dark">{estado.mensagem}</p>}
 

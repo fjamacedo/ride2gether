@@ -40,6 +40,8 @@ export async function updateSession(request: NextRequest) {
     // da URL, que o browser nunca envia ao servidor — só o JS do lado do
     // cliente a consegue processar depois da página carregar.
     request.nextUrl.pathname.startsWith('/redefinir-password') ||
+    request.nextUrl.pathname.startsWith('/termos') ||
+    request.nextUrl.pathname.startsWith('/privacidade') ||
     request.nextUrl.pathname === '/'
 
   if (!user && !rotaPublica) {

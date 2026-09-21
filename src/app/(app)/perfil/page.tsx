@@ -6,6 +6,7 @@ import {
   associarAClube,
 } from '@/lib/data/clube'
 import { listarMinhasMotas, adicionarMota, removerMota } from '@/lib/data/motas'
+import Link from 'next/link'
 import { ActivarNotificacoes } from '@/components/ActivarNotificacoes'
 import { FormularioPerfil } from '@/components/FormularioPerfil'
 import { BotaoAssociarClube } from '@/components/BotaoAssociarClube'
@@ -69,6 +70,15 @@ export default async function PaginaPerfil() {
               </li>
             ))}
         </ul>
+      </section>
+
+      <section className="flex gap-4 border-t pt-4 text-sm text-neutral-500">
+        <Link href="/termos" className="underline hover:text-ride-green">
+          Termos de Utilização
+        </Link>
+        <Link href="/privacidade" className="underline hover:text-ride-green">
+          Política de Privacidade
+        </Link>
       </section>
     </div>
   )
