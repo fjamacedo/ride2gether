@@ -107,8 +107,8 @@ export default function PaginaTermos() {
           <h2 className="mb-2 font-semibold text-neutral-900">10. Contacto</h2>
           <p>
             Para qualquer questão sobre estes termos:{' '}
-            <a href="mailto:geral@ride2gether.pt" className="text-ride-green underline">
-              geral@ride2gether.pt
+            <a href="mailto:fjamacedo@gmail.com" className="text-ride-green underline">
+              fjamacedo@gmail.com
             </a>
           </p>
         </section>

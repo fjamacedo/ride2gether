@@ -23,8 +23,8 @@ export default function PaginaPrivacidade() {
           </p>
           <p className="mt-2">
             Contacto para questões de privacidade:{' '}
-            <a href="mailto:privacidade@ride2gether.pt" className="text-ride-green underline">
-              privacidade@ride2gether.pt
+            <a href="mailto:fjamacedo@gmail.com" className="text-ride-green underline">
+              fjamacedo@gmail.com
             </a>
           </p>
         </section>
@@ -138,8 +138,8 @@ export default function PaginaPrivacidade() {
           </ul>
           <p className="mt-2">
             Para exercer qualquer destes direitos, contacta-nos através de{' '}
-            <a href="mailto:privacidade@ride2gether.pt" className="text-ride-green underline">
-              privacidade@ride2gether.pt
+            <a href="mailto:fjamacedo@gmail.com" className="text-ride-green underline">
+              fjamacedo@gmail.com
             </a>
             .
           </p>
