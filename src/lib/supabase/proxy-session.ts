@@ -34,6 +34,7 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/registo') ||
     request.nextUrl.pathname.startsWith('/recuperar-password') ||
+    request.nextUrl.pathname.startsWith('/auth/confirm') ||
     // /redefinir-password tem de ficar acessível sem sessão "visível" ao
     // proxy: a sessão de recuperação chega num fragmento (#access_token=...)
     // da URL, que o browser nunca envia ao servidor — só o JS do lado do
