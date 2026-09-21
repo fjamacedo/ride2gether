@@ -1,11 +1,13 @@
 import Link from 'next/link'
 import { Logo } from '@/components/Logo'
+import { BotaoVoltar } from '@/components/BotaoVoltar'
 
 export const metadata = { title: 'Termos de Utilização — Ride2gether' }
 
 export default function PaginaTermos() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-10 text-neutral-800">
+      <BotaoVoltar />
       <Link href="/">
         <Logo tamanho="sm" />
       </Link>
@@ -112,12 +114,6 @@ export default function PaginaTermos() {
             </a>
           </p>
         </section>
-
-        <p className="mt-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-xs text-neutral-500">
-          Este documento foi redigido de boa-fé, mas não substitui aconselhamento jurídico
-          profissional. Recomenda-se revisão por um advogado antes de uma utilização com um
-          volume relevante de utilizadores reais.
-        </p>
       </div>
     </main>
   )
