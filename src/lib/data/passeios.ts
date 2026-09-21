@@ -2,9 +2,11 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import * as Sentry from '@sentry/nextjs'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { obterUtilizadorAutenticado } from '@/lib/data/clube'
+import { notificarNovoPasseio } from '@/lib/push/notificar-passeio'
 import type { AmbitoVisibilidade, Passeio } from '@/lib/types/database'
 import type { EstadoFormulario } from '@/lib/auth/actions'
 
@@ -60,25 +62,38 @@ export async function criarPasseio(
   }
 
   const supabase = await createClient()
-  const { error } = await supabase.from('passeios').insert({
-    organizador_clube_id: organizador.clubeId ?? null,
-    organizador_utilizador_id: organizador.clubeId ? null : user.id,
-    titulo: dados.data.titulo,
-    data: new Date(dados.data.data).toISOString(),
-    local: dados.data.local,
-    descricao: dados.data.descricao || null,
-    rota: dados.data.rota || null,
-    ambito_visibilidade: dados.data.ambito_visibilidade as AmbitoVisibilidade,
-    max_participantes: paraInteiroOpcional(dados.data.max_participantes),
-    cilindrada_min: paraInteiroOpcional(dados.data.cilindrada_min),
-    cilindrada_max: paraInteiroOpcional(dados.data.cilindrada_max),
-    marca: dados.data.marca || null,
-  })
+  const { data: passeio, error } = await supabase
+    .from('passeios')
+    .insert({
+      organizador_clube_id: organizador.clubeId ?? null,
+      organizador_utilizador_id: organizador.clubeId ? null : user.id,
+      titulo: dados.data.titulo,
+      data: new Date(dados.data.data).toISOString(),
+      local: dados.data.local,
+      descricao: dados.data.descricao || null,
+      rota: dados.data.rota || null,
+      ambito_visibilidade: dados.data.ambito_visibilidade as AmbitoVisibilidade,
+      max_participantes: paraInteiroOpcional(dados.data.max_participantes),
+      cilindrada_min: paraInteiroOpcional(dados.data.cilindrada_min),
+      cilindrada_max: paraInteiroOpcional(dados.data.cilindrada_max),
+      marca: dados.data.marca || null,
+    })
+    .select('*')
+    .single()
 
   if (error) return { erro: error.message }
 
   revalidatePath('/passeios')
   if (organizador.clubeId) revalidatePath('/dashboard/passeios')
+
+  // Falhas no envio de notificações (ex.: chave service_role ainda não
+  // configurada) nunca devem impedir a criação do passeio — só reportadas.
+  try {
+    await notificarNovoPasseio(passeio as Passeio, user.id)
+  } catch (erro) {
+    Sentry.captureException(erro)
+  }
+
   redirect(organizador.redirecionarPara)
 }
 

@@ -88,6 +88,17 @@ export type PushSubscriptionRow = {
   auth: string
   created_at: string
 }
+
+export type EstadoEnvioNotificacao = 'pendente' | 'enviado' | 'falhado'
+
+export type Notificacao = {
+  id: string
+  passeio_id: string
+  destinatario_id: string
+  estado_envio: EstadoEnvioNotificacao
+  created_at: string
+}
+
 export type Database = {
   __InternalSupabase: {
     PostgrestVersion: '13'
@@ -134,6 +145,12 @@ export type Database = {
         Row: Mota
         Insert: Partial<Mota> & { utilizador_id: string; marca: string }
         Update: Partial<Mota>
+        Relationships: []
+      }
+      notificacoes: {
+        Row: Notificacao
+        Insert: Partial<Notificacao> & { passeio_id: string; destinatario_id: string }
+        Update: Partial<Notificacao>
         Relationships: []
       }
     }
