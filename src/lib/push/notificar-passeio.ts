@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { enviarPush } from '@/lib/push/vapid'
 import type { Passeio } from '@/lib/types/database'
@@ -77,14 +78,30 @@ export async function notificarNovoPasseio(passeio: Passeio, criadorId: string) 
   const supabase = createAdminClient()
 
   const destinatarios = await obterDestinatariosElegiveis(supabase, passeio, criadorId)
-  if (destinatarios.length === 0) return
+  if (destinatarios.length === 0) {
+    Sentry.captureMessage('notificarNovoPasseio: 0 destinatários elegíveis', {
+      level: 'info',
+      extra: {
+        passeioId: passeio.id,
+        ambitoVisibilidade: passeio.ambito_visibilidade,
+        organizadorClubeId: passeio.organizador_clube_id,
+      },
+    })
+    return
+  }
 
   const { data: subscricoes } = await supabase
     .from('push_subscriptions')
     .select('utilizador_id, endpoint, p256dh, auth')
     .in('utilizador_id', destinatarios)
 
-  if (!subscricoes || subscricoes.length === 0) return
+  if (!subscricoes || subscricoes.length === 0) {
+    Sentry.captureMessage('notificarNovoPasseio: destinatários elegíveis sem subscrição push', {
+      level: 'info',
+      extra: { passeioId: passeio.id, destinatarios },
+    })
+    return
+  }
 
   const payload = {
     titulo: `Novo passeio: ${passeio.titulo}`,
@@ -110,6 +127,8 @@ export async function notificarNovoPasseio(passeio: Passeio, criadorId: string) 
         const codigo = (erro as { statusCode?: number }).statusCode
         if (codigo === 404 || codigo === 410) {
           await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint)
+        } else {
+          Sentry.captureException(erro, { extra: { passeioId: passeio.id, endpoint: sub.endpoint } })
         }
         return {
           passeio_id: passeio.id,
