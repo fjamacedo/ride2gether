@@ -33,10 +33,24 @@ async function obterDestinatariosElegiveis(
     return (membros ?? []).map((m) => m.utilizador_id).filter((id) => id !== criadorId)
   }
 
-  const [{ data: perfis }, { data: motas }] = await Promise.all([
+  const [
+    { data: perfis, error: erroPerfis },
+    { data: motas, error: erroMotas },
+  ] = await Promise.all([
     supabase.from('perfis').select('id'),
     supabase.from('motas').select('utilizador_id, cilindrada_cc, marca'),
   ])
+
+  if (erroPerfis || erroMotas) {
+    Sentry.captureMessage('notificarNovoPasseio: erro ao ler perfis/motas', {
+      level: 'error',
+      extra: {
+        passeioId: passeio.id,
+        erroPerfis: erroPerfis?.message,
+        erroMotas: erroMotas?.message,
+      },
+    })
+  }
 
   if (!perfis) return []
 
@@ -77,14 +91,20 @@ async function obterDestinatariosElegiveis(
 export async function notificarNovoPasseio(passeio: Passeio, criadorId: string) {
   const supabase = createAdminClient()
 
+  const { count: totalPerfis } = await supabase
+    .from('perfis')
+    .select('id', { count: 'exact', head: true })
+
   const destinatarios = await obterDestinatariosElegiveis(supabase, passeio, criadorId)
   if (destinatarios.length === 0) {
     Sentry.captureMessage('notificarNovoPasseio: 0 destinatários elegíveis', {
       level: 'info',
       extra: {
         passeioId: passeio.id,
+        criadorId,
         ambitoVisibilidade: passeio.ambito_visibilidade,
         organizadorClubeId: passeio.organizador_clube_id,
+        totalPerfisNaPlataforma: totalPerfis,
       },
     })
     return
