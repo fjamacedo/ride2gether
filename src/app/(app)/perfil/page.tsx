@@ -4,12 +4,14 @@ import {
   obterMinhasAdesoes,
   actualizarPerfil,
   associarAClube,
+  desassociarDeClube,
 } from '@/lib/data/clube'
 import { listarMinhasMotas, adicionarMota, removerMota } from '@/lib/data/motas'
 import Link from 'next/link'
 import { ActivarNotificacoes } from '@/components/ActivarNotificacoes'
 import { FormularioPerfil } from '@/components/FormularioPerfil'
 import { BotaoAssociarClube } from '@/components/BotaoAssociarClube'
+import { BotaoDesassociarClube } from '@/components/BotaoDesassociarClube'
 import { GestaoMotas } from '@/components/GestaoMotas'
 
 export default async function PaginaPerfil() {
@@ -42,10 +44,16 @@ export default async function PaginaPerfil() {
       <section>
         <h2 className="mb-2 font-medium text-neutral-900">Clubes</h2>
         {adesoes.length > 0 && (
-          <ul className="mb-3 flex flex-col gap-1 text-sm text-neutral-700">
+          <ul className="mb-3 flex flex-col gap-2">
             {adesoes.map((a) => (
-              <li key={a.clube_id}>
-                {(a.clubes as { nome?: string } | null)?.nome} — {a.estado}
+              <li
+                key={a.clube_id}
+                className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white px-3 py-2 shadow-sm"
+              >
+                <span className="text-sm text-neutral-700">
+                  {(a.clubes as { nome?: string } | null)?.nome} — {a.estado}
+                </span>
+                <BotaoDesassociarClube clubeId={a.clube_id} action={desassociarDeClube} />
               </li>
             ))}
           </ul>

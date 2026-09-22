@@ -97,6 +97,99 @@ export async function criarPasseio(
   redirect(organizador.redirecionarPara)
 }
 
+export async function souOrganizadorDoPasseio(passeio: Passeio): Promise<boolean> {
+  const user = await obterUtilizadorAutenticado()
+  if (!user) return false
+  if (passeio.organizador_utilizador_id === user.id) return true
+  if (!passeio.organizador_clube_id) return false
+
+  const supabase = await createClient()
+  const { data } = await supabase.rpc('dirige_clube', {
+    p_clube_id: passeio.organizador_clube_id,
+    p_utilizador_id: user.id,
+  })
+  return !!data
+}
+
+export async function editarPasseio(
+  passeioId: string,
+  _estadoAnterior: EstadoFormulario,
+  formData: FormData
+): Promise<EstadoFormulario> {
+  const user = await obterUtilizadorAutenticado()
+  if (!user) return { erro: 'Sessão expirada, entra novamente.' }
+
+  const dados = esquemaPasseio.safeParse({
+    titulo: formData.get('titulo'),
+    data: formData.get('data'),
+    local: formData.get('local'),
+    descricao: formData.get('descricao'),
+    rota: formData.get('rota'),
+    ambito_visibilidade: formData.get('ambito_visibilidade'),
+    max_participantes: formData.get('max_participantes'),
+    cilindrada_min: formData.get('cilindrada_min'),
+    cilindrada_max: formData.get('cilindrada_max'),
+    marca: formData.get('marca'),
+  })
+
+  if (!dados.success) {
+    return { erro: dados.error.issues[0]?.message ?? 'Dados inválidos' }
+  }
+
+  const supabase = await createClient()
+  // As RLS (passeios_update_organizador) já restringem esta actualização ao
+  // organizador (individual) ou a quem dirige o clube organizador — se `data`
+  // vier vazio, a linha não correspondeu (não existe ou não é permitido).
+  const { error, data } = await supabase
+    .from('passeios')
+    .update({
+      titulo: dados.data.titulo,
+      data: new Date(dados.data.data).toISOString(),
+      local: dados.data.local,
+      descricao: dados.data.descricao || null,
+      rota: dados.data.rota || null,
+      ambito_visibilidade: dados.data.ambito_visibilidade as AmbitoVisibilidade,
+      max_participantes: paraInteiroOpcional(dados.data.max_participantes),
+      cilindrada_min: paraInteiroOpcional(dados.data.cilindrada_min),
+      cilindrada_max: paraInteiroOpcional(dados.data.cilindrada_max),
+      marca: dados.data.marca || null,
+    })
+    .eq('id', passeioId)
+    .select('id')
+    .maybeSingle()
+
+  if (error) return { erro: error.message }
+  if (!data) return { erro: 'Não tens permissão para editar este passeio.' }
+
+  revalidatePath('/passeios')
+  revalidatePath(`/passeios/${passeioId}`)
+  revalidatePath('/dashboard/passeios')
+  redirect(`/passeios/${passeioId}`)
+}
+
+export async function eliminarPasseio(
+  passeioId: string,
+  redirecionarPara: string
+): Promise<EstadoFormulario> {
+  const user = await obterUtilizadorAutenticado()
+  if (!user) return { erro: 'Sessão expirada, entra novamente.' }
+
+  const supabase = await createClient()
+  const { error, data } = await supabase
+    .from('passeios')
+    .delete()
+    .eq('id', passeioId)
+    .select('id')
+    .maybeSingle()
+
+  if (error) return { erro: error.message }
+  if (!data) return { erro: 'Não tens permissão para eliminar este passeio.' }
+
+  revalidatePath('/passeios')
+  revalidatePath('/dashboard/passeios')
+  redirect(redirecionarPara)
+}
+
 // Nota sobre "elegibilidade" (secção 3.2): os critérios do passeio (cilindrada/marca)
 // só filtram quando o utilizador tem pelo menos uma mota registada que os
 // contrarie — sem motas registadas, não se filtra nada (evita esconder

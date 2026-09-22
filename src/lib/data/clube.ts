@@ -182,6 +182,26 @@ export async function associarAClube(clubeId: string) {
   return {}
 }
 
+export async function desassociarDeClube(clubeId: string) {
+  const user = await obterUtilizadorAutenticado()
+  if (!user) return { erro: 'Sessão expirada, entra novamente.' }
+
+  const supabase = await createClient()
+  const { error, data } = await supabase
+    .from('clube_membros')
+    .delete()
+    .eq('clube_id', clubeId)
+    .eq('utilizador_id', user.id)
+    .select('clube_id')
+    .maybeSingle()
+
+  if (error) return { erro: error.message }
+  if (!data) return { erro: 'Não foi possível sair deste clube.' }
+
+  revalidatePath('/perfil')
+  return {}
+}
+
 const esquemaPerfil = z.object({
   nome: z.string().min(2, 'Indica o teu nome'),
   contacto: z.string().optional(),

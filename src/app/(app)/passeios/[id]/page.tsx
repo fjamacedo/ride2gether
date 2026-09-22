@@ -1,11 +1,15 @@
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
 import {
   obterPasseio,
   listarInscritos,
   obterMinhaInscricao,
   contarInscritos,
+  souOrganizadorDoPasseio,
+  eliminarPasseio,
 } from '@/lib/data/passeios'
 import { BotaoInscricao } from '@/components/BotaoInscricao'
+import { BotaoEliminarPasseio } from '@/components/BotaoEliminarPasseio'
 
 const rotulosAmbito: Record<string, string> = {
   privado: 'Privado (sócios)',
@@ -21,11 +25,16 @@ export default async function PaginaDetalhePasseio(props: PageProps<'/passeios/[
   const passeio = await obterPasseio(id)
   if (!passeio) notFound()
 
-  const [inscritos, minhaInscricao, totalInscritos] = await Promise.all([
+  const [inscritos, minhaInscricao, totalInscritos, souOrganizador] = await Promise.all([
     listarInscritos(id),
     obterMinhaInscricao(id),
     contarInscritos(id),
+    souOrganizadorDoPasseio(passeio),
   ])
+
+  const redirecionarParaAposEliminar = passeio.organizador_clube_id
+    ? '/dashboard/passeios'
+    : '/passeios'
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6">
@@ -79,6 +88,22 @@ export default async function PaginaDetalhePasseio(props: PageProps<'/passeios/[
       </dl>
 
       {passeio.descricao && <p className="mt-4 text-neutral-700">{passeio.descricao}</p>}
+
+      {souOrganizador && (
+        <div className="mt-4 flex gap-3">
+          <Link
+            href={`/passeios/${id}/editar`}
+            className="rounded border border-neutral-300 px-3 py-2 text-sm text-neutral-700 transition hover:border-ride-green hover:text-ride-green"
+          >
+            Editar
+          </Link>
+          <BotaoEliminarPasseio
+            passeioId={id}
+            redirecionarPara={redirecionarParaAposEliminar}
+            action={eliminarPasseio}
+          />
+        </div>
+      )}
 
       <div className="mt-6">
         <BotaoInscricao passeioId={id} jaInscrito={!!minhaInscricao} />

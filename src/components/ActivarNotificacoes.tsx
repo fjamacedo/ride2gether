@@ -10,9 +10,8 @@ function base64UrlParaUint8Array(base64Url: string) {
 }
 
 export function ActivarNotificacoes() {
-  const [estado, setEstado] = useState<'indisponivel' | 'inactivo' | 'activo' | 'a_activar'>(
-    'inactivo'
-  )
+  const [estado, setEstado] = useState<'indisponivel' | 'inactivo' | 'activo'>('inactivo')
+  const [aProcessar, setAProcessar] = useState(false)
 
   useEffect(() => {
     let cancelado = false
@@ -34,7 +33,7 @@ export function ActivarNotificacoes() {
   }, [])
 
   async function activar() {
-    setEstado('a_activar')
+    setAProcessar(true)
     try {
       const permissao = await Notification.requestPermission()
       if (permissao !== 'granted') {
@@ -63,6 +62,27 @@ export function ActivarNotificacoes() {
       setEstado('activo')
     } catch {
       setEstado('inactivo')
+    } finally {
+      setAProcessar(false)
+    }
+  }
+
+  async function desactivar() {
+    setAProcessar(true)
+    try {
+      const registo = await navigator.serviceWorker.ready
+      const subscricao = await registo.pushManager.getSubscription()
+      if (subscricao) {
+        await subscricao.unsubscribe()
+        await fetch('/api/push/subscribe', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ endpoint: subscricao.endpoint }),
+        })
+      }
+      setEstado('inactivo')
+    } finally {
+      setAProcessar(false)
     }
   }
 
@@ -76,16 +96,27 @@ export function ActivarNotificacoes() {
   }
 
   if (estado === 'activo') {
-    return <p className="text-sm text-ride-green-dark">Notificações activas ✓</p>
+    return (
+      <div className="flex items-center gap-3">
+        <p className="text-sm text-ride-green-dark">Notificações activas ✓</p>
+        <button
+          onClick={desactivar}
+          disabled={aProcessar}
+          className="text-sm text-neutral-500 underline hover:text-ride-red disabled:opacity-50"
+        >
+          {aProcessar ? 'A desactivar…' : 'Desactivar'}
+        </button>
+      </div>
+    )
   }
 
   return (
     <button
       onClick={activar}
-      disabled={estado === 'a_activar'}
+      disabled={aProcessar}
       className="rounded border border-ride-green px-3 py-2 text-sm text-ride-green transition hover:bg-ride-green hover:text-white disabled:opacity-50"
     >
-      {estado === 'a_activar' ? 'A activar…' : 'Activar notificações'}
+      {aProcessar ? 'A activar…' : 'Activar notificações'}
     </button>
   )
 }
